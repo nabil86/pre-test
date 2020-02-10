@@ -14,16 +14,21 @@
  */
 package com.priceminister.account.implementation;
 
-import com.priceminister.account.*;
-
+import com.priceminister.account.AccountRule;
+import com.priceminister.account.Amount;
+import com.priceminister.exception.IllegalBalanceException;
 
 public class CustomerAccountRule implements AccountRule {
 
-    /* (non-Javadoc)
-     * @see com.priceminister.account.AccountRule#withdrawPermitted(java.lang.Double)
-     */
-    public boolean withdrawPermitted(Double resultingAccountBalance) {
-        return resultingAccountBalance >= 0;
-    }
+	@Override
+	public boolean withdrawPermitted(Balance balance, Amount withdrawnAmount) {
 
+		final Amount currentAmount = balance.getAmount();
+		if (withdrawnAmount.compareTo(currentAmount) > 0) {
+			final Double illegalAmount = currentAmount.getValue() - withdrawnAmount.getValue();
+			throw new IllegalBalanceException(illegalAmount);
+		}
+
+		return true;
+	}
 }
